@@ -1,16 +1,34 @@
+/*global it:true, describe:true */
 "use strict";
 var monocle = require('../lib/monocle')
-  , o_0 = monocle.o_0
+  , o0 = monocle.o0
   , launch = monocle.launch
   , run = monocle.run
   , Return = monocle.Return
+  , oR = monocle.Return
   , Callback = monocle.Callback
+  , oC = monocle.Callback
   , should = require('should');
+
+var sleep = o0(function*(secs) {
+  var cb = oC();
+  setTimeout(cb.handler(), secs * 1000);
+  yield cb;
+});
+
+var square = o0(function*(x) {
+  yield oR(x * x);
+});
+
+var cube = o0(function*(x) {
+  var squareOfX = yield square(x);
+  yield oR(x * squareOfX);
+});
 
 describe('monocle', function() {
   it('should not reach code after returns', function(done) {
     var shouldntChange = "foo";
-    var square = o_0(function*(x) {
+    var square = o0(function*(x) {
       yield new Return(x * x);
       shouldntChange = "bar";
     });
@@ -21,8 +39,20 @@ describe('monocle', function() {
       done();
     });
   });
-  it('should unwind callbacks', function(done) {
-    var f1 = o_0(function*() {
+
+  it('should work without new', function(done) {
+    run(function*() {
+      var s = yield square(4);
+      s.should.equal(16);
+      var start = Date.now();
+      yield sleep(0.5);
+      (Date.now() - start).should.be.above(499);
+      done();
+    });
+  });
+
+  it('should with new asynchronously', function(done) {
+    var f1 = o0(function*() {
       var cb = new Callback();
       setTimeout(cb.handler(), 500);
       yield cb;
@@ -31,6 +61,59 @@ describe('monocle', function() {
       var start = Date.now();
       yield f1();
       (Date.now() - start).should.be.above(499);
+      done();
+    });
+  });
+
+  it('should catch exceptions and exit oroutine', function(done) {
+    var shouldntChange = "foo";
+    var fail = o0(function*() {
+      throw new Error("bad");
+      shouldntChange = "bar";
+    });
+    run(function*() {
+      var err;
+      try {
+        yield fail();
+      } catch(e) {
+        err = e;
+      }
+      should.exist(err);
+      err.message.should.equal("bad");
+      shouldntChange.should.equal("foo");
+      done();
+    });
+  });
+
+  it('should not yield things other than Callbacks/Returns', function(done) {
+    var invalid = o0(function*() {
+      yield "this won't work";
+    });
+    run(function*() {
+      var err;
+      try {
+        yield invalid();
+      } catch (e) {
+        err = e;
+      }
+      should.exist(err);
+      err.message.should.include("o-routines can only yield");
+      done();
+    });
+  });
+
+  it('should work with launch', function(done) {
+    launch(o0(function*() {
+      var x = yield square(5);
+      x.should.equal(25);
+      done();
+    }));
+  });
+
+  it('should work with embedded o-routines', function(done) {
+    run(function*() {
+      var x = yield cube(3);
+      x.should.equal(27);
       done();
     });
   });
