@@ -117,4 +117,42 @@ describe('monocle', function() {
       done();
     });
   });
+
+  it('should pass multiple parameters to o-routine', function(done) {
+    var add = o0(function*(x, y) {
+      yield Return(x + y);
+    });
+    run(function*() {
+      var sum = yield add(3, 6);
+      sum.should.equal(9);
+      done();
+    });
+  });
+
+  it('should handle converting node-style async err handling', function(done) {
+    var asyncFn = function(shouldErr, cb) {
+      if (shouldErr) {
+        return cb(new Error("bad"));
+      }
+      cb(null, "yay!");
+    };
+    var syncFn = o0(function*(shouldErr) {
+      var cb = oC();
+      asyncFn(shouldErr, cb.handler());
+      yield Return(yield cb);
+    });
+    run(function*() {
+      var res = yield syncFn(false);
+      res.should.equal("yay!");
+      var err;
+      try {
+        res = yield syncFn(true);
+      } catch (e) {
+        err = e;
+      }
+      should.exist(err);
+      err.message.should.equal("bad");
+      done();
+    });
+  });
 });
