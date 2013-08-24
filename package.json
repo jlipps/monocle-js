@@ -1,0 +1,40 @@
+{
+  "name": "monocle.js",
+  "description": "Blocking syntax using generators. Port of sah/monocle",
+  "tags": [
+    "javascript",
+    "generators",
+    "async",
+    "sync"
+  ],
+  "version": "0.0.1",
+  "author": "jlipps@gmail.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jlipps/monocle-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jlipps/monocle-js/issues"
+  },
+  "engines": [
+    "node"
+  ],
+  "main": "./lib/monocle.js",
+  "directories": {
+    "lib": "./lib"
+  },
+  "dependencies": {
+    "underscore": "~1.4.3"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "devDependencies": {
+    "mocha": "~1.8.1",
+    "grunt": "~0.4.0",
+    "grunt-cli": "~0.1.6",
+    "should": "~1.2.1",
+    "grunt-mocha-test": "~0.2.0",
+    "grunt-contrib-jshint": "~0.1.1"
+  }
+}
