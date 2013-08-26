@@ -5,24 +5,22 @@ var monocle = require('../lib/monocle')
   , launch = monocle.launch
   , run = monocle.run
   , Return = monocle.Return
-  , oR = monocle.Return
-  , Callback = monocle.Callback
-  , oC = monocle.Callback
+  , oC = monocle.callback
   , should = require('should');
 
 var sleep = o0(function*(secs) {
   var cb = oC();
-  setTimeout(cb.handler(), secs * 1000);
+  setTimeout(cb, secs * 1000);
   yield cb;
 });
 
 var square = o0(function*(x) {
-  yield oR(x * x);
+  yield x * x;
 });
 
 var cube = o0(function*(x) {
   var squareOfX = yield square(x);
-  yield oR(x * squareOfX);
+  yield x * squareOfX;
 });
 
 describe('monocle', function() {
@@ -51,10 +49,10 @@ describe('monocle', function() {
     });
   });
 
-  it('should with new asynchronously', function(done) {
+  it('should work with new asynchronously', function(done) {
     var f1 = o0(function*() {
-      var cb = new Callback();
-      setTimeout(cb.handler(), 500);
+      var cb = oC();
+      setTimeout(cb, 500);
       yield cb;
     });
     run(function*() {
@@ -85,23 +83,6 @@ describe('monocle', function() {
     });
   });
 
-  it('should not yield things other than Callbacks/Returns', function(done) {
-    var invalid = o0(function*() {
-      yield "this won't work";
-    });
-    run(function*() {
-      var err;
-      try {
-        yield invalid();
-      } catch (e) {
-        err = e;
-      }
-      should.exist(err);
-      err.message.should.include("o-routines can only yield");
-      done();
-    });
-  });
-
   it('should work with launch', function(done) {
     launch(o0(function*() {
       var x = yield square(5);
@@ -120,7 +101,7 @@ describe('monocle', function() {
 
   it('should pass multiple parameters to o-routine', function(done) {
     var add = o0(function*(x, y) {
-      yield Return(x + y);
+      yield x + y;
     });
     run(function*() {
       var sum = yield add(3, 6);
@@ -138,8 +119,8 @@ describe('monocle', function() {
     };
     var syncFn = o0(function*(shouldErr) {
       var cb = oC();
-      asyncFn(shouldErr, cb.handler());
-      yield Return(yield cb);
+      asyncFn(shouldErr, cb);
+      yield (yield cb);
     });
     run(function*() {
       var res = yield syncFn(false);
