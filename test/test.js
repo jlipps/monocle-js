@@ -65,19 +65,49 @@ describe('monocle', function() {
 
   it('should catch exceptions and exit oroutine', function(done) {
     var shouldntChange = "foo";
-    var fail = o0(function*() {
-      throw new Error("bad");
+    var fail1 = o0(function*() {
+      throw new Error("foo bar baz");
       shouldntChange = "bar";
+    });
+    var fail2 = o0(function*() {
+      yield fail1();
     });
     run(function*() {
       var err;
       try {
-        yield fail();
+        yield fail2();
       } catch(e) {
         err = e;
       }
       should.exist(err);
-      err.message.should.equal("bad");
+      err.message.should.equal("foo bar baz");
+      shouldntChange.should.equal("foo");
+      done();
+    });
+  });
+
+  it('should catch exceptions in async functions', function(done) {
+    var shouldntChange = "foo";
+    var errInAsync = function(cb) {
+      cb(new Error("foo bar baz"));
+    };
+    var fail1 = o0(function*() {
+      var cb = oC();
+      errInAsync(cb);
+      yield cb;
+    });
+    var fail2 = o0(function*() {
+      yield fail1();
+    });
+    run(function*() {
+      var err;
+      try {
+        yield fail2();
+      } catch(e) {
+        err = e;
+      }
+      should.exist(err);
+      err.message.should.equal("foo bar baz");
       shouldntChange.should.equal("foo");
       done();
     });
@@ -133,6 +163,41 @@ describe('monocle', function() {
       }
       should.exist(err);
       err.message.should.equal("bad");
+      done();
+    });
+  });
+
+  it('should bind generators to calling object', function(done) {
+    var bindObj = {
+      foo: 'bar'
+    };
+
+    bindObj.gen = o0(function*() {
+      yield this.foo;
+    });
+
+    run(function*() {
+      var res = yield this.gen();
+      res.should.equal('bar');
+      done();
+    }, bindObj);
+  });
+
+  it('should work with classes', function(done) {
+    var MyClass = function() {
+      this.foo = 'bar';
+    };
+    MyClass.prototype.myOroutine = o0(function*() {
+      var s = yield square(3);
+      yield this.foo + ' ' + s;
+    });
+    MyClass.prototype.run = function(gen) {
+      run(gen, this);
+    };
+    var obj = new MyClass();
+    obj.run(function*() {
+      var res = yield this.myOroutine();
+      res.should.equal('bar 9');
       done();
     });
   });
