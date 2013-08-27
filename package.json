@@ -1,5 +1,5 @@
 {
-  "name": "monocle.js",
+  "name": "monocle",
   "description": "Blocking syntax using generators. Port of sah/monocle",
   "tags": [
     "javascript",
