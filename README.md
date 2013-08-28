@@ -158,7 +158,7 @@ yield data;
 ```
 
 In the first line, we're using yield as a way to retrieve the result of an
-asynchronous function. This is (hat tip to @sah) "yield as in traffic". In the
+asynchronous function. This is (hat tip to [@sah](https://github.com/sah)) "yield as in traffic". In the
 second line, we're doing the same thing, only we're not assigning the result to
 anything. These lines essentially say, "wait until the asynchronous process is
 finished, and give me the result". In the third line, we use yield not as a way
