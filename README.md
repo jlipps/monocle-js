@@ -185,3 +185,13 @@ and given Node's callback-based HTTP library, WebDriver test code descends
 quickly into callback hell. Yiewd is a good example of how an existing
 callback-based library can be wrapped easily and its methods turned into
 o-routines for use with Monocle.
+
+Once you've 'monoclized' an existing library, or created a new library using
+o-routines, it's easy to write asynchronous Javascript code in an easy-to-read
+synchronous fashion.
+
+Monocle-enabled libraries
+-------------------------
+A list of Node libraries that export o-routines:
+
+* [Yiewd](https://github.com/jlipps/yiewd)
