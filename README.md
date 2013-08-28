@@ -11,8 +11,8 @@ A lot of Node libraries and Javascript libraries in general follow the callback 
 var request = require('request')
   , fs = require('fs');
 
-var myLibraryFunction = function(cb) {
-    request('http://somesite.com/json/data', function(err, data) {
+var myLibraryFunction = function(jsonUrl, cb) {
+    request(jsonUrl, function(err, data) {
         if (err) {
             return cb(err);
         }
@@ -25,7 +25,7 @@ var myLibraryFunction = function(cb) {
     });
 };
 
-myLibraryFunction(function(err, data) {
+myLibraryFunction('http://somesite.com/json/data', function(err, data) {
     if (err) {
         console.log("Downloading and writing file failed!");
     } else {
@@ -46,15 +46,15 @@ var request = require('request.monocle')
   , monocle = require('monocle.js')
   , o0 = monocle.o0;
 
-var myLibraryFunction = o0(function*() {
-    var data = yield request('http://somesite.com/json/data');
+var myLibraryFunction = o0(function*(jsonUrl) {
+    var data = yield request(jsonUrl);
     yield fs.writeFile('/path/to/my/file.json', data);
     yield data;
 });
 
 var main = o0(function*() {
     try {
-        var data = yield myLibraryFunction();
+        var data = yield myLibraryFunction('http://somesite.com/json/data');
         console.log("Downloading and writing file was successful!");
         console.log(data);
     } catch (err) {
@@ -93,7 +93,7 @@ example above:
 ```js
 monocle.run(function*() {
     try {
-        yield myLibraryFunction();
+        yield myLibraryFunction('http://somesite.com/json/data');
         console.log("Downloading and writing file was successful!");
     } catch (err) {
         console.log("Downloading and writing file failed!");
@@ -116,9 +116,9 @@ var request = require('request')
   , o0 = monocle.o0;
   , oC = monocle.callback;
 
-var myLibraryFunction = o0(function*() {
+var myLibraryFunction = o0(function*(jsonUrl) {
     var cb = oC();
-    request('http://somesite.com/json/data', cb);
+    request(jsonUrl, cb);
     var data = yield cb;
     cb = oC();
     fs.writeFile('/path/to/my/file.json', data, cb);
@@ -127,7 +127,7 @@ var myLibraryFunction = o0(function*() {
 
 monocle.run(function*() {
     try {
-        yield myLibraryFunction();
+        yield myLibraryFunction('http://somesite.com/json/data');
         console.log("Downloading and writing file was successful!");
     } catch (err) {
         console.log("Downloading and writing file failed!");
@@ -144,7 +144,7 @@ easy to incorporate library methods which have not yet been monoclized.
 
 Functions which have been monoclized are called 'o-routines', and, from within
 other o-routines, can simply be yielded to without creating a callback. This is
-why we simply `yield myLibraryFunction()` in the example above.
+why we simply `yield myLibraryFunction(jsonUrl)` in the example above.
 
 A tale of two yields
 -------------------
@@ -152,7 +152,7 @@ Reading through the examples above, you'll notice that we're using `yield` in
 two ways, exemplified in these three lines:
 
 ```js
-var data = yield request('http://somesite.com/json/data');
+var data = yield request(jsonUrl);
 yield fs.writeFile('/path/to/my/file.json', data);
 yield data;
 ```
