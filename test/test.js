@@ -201,4 +201,15 @@ describe('monocle', function() {
       done();
     });
   });
+
+  it('should unravel lots of callbacks', function(done) {
+    run(function*() {
+      var i;
+      for (i = 0; i < 100; i++) {
+        yield sleep(0.02);
+      };
+      i.should.equal(100);
+      done();
+    });
+  });
 });
