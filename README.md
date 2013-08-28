@@ -52,15 +52,15 @@ Here's what the same code could look like using Monocle:
 var request = require('request.monocle')
   , fs = require('fs.monocle')
   , monocle = require('monocle.js')
-  , o0 = monocle.o0;
+  , o_O = monocle.o_O;
 
-var myLibraryFunction = o0(function*(jsonUrl) {
+var myLibraryFunction = o_O(function*(jsonUrl) {
     var data = yield request(jsonUrl);
     yield fs.writeFile('/path/to/my/file.json', data);
     yield data;
 });
 
-var main = o0(function*() {
+var main = o_O(function*() {
     try {
         var data = yield myLibraryFunction('http://somesite.com/json/data');
         console.log("Downloading and writing file was successful!");
@@ -77,7 +77,7 @@ As you can see, the points at which you would have created an anonymous
 function to handle the asynchronous callback, you now simply use the `yield`
 keyword to block until the callback's result is ready. And the library
 functions you create are 'monoclized' by wrapping them (or 'decorating them')
-with the `o0` method.
+with the `o_O` method.
 
 Also, notice that you don't need to do any explicit error handling if you don't
 want to. Errors will be thrown like synchronous JS code, and can be caught and
@@ -112,14 +112,14 @@ Monocle as well. Here's the previous example without the assumption that
 var request = require('request')
   , fs = require('fs')
   , monocle = require('monocle.js')
-  , o0 = monocle.o0;
-  , oC = monocle.callback;
+  , o_O = monocle.o_O;
+  , o_C = monocle.callback;
 
-var myLibraryFunction = o0(function*(jsonUrl) {
-    var cb = oC();
+var myLibraryFunction = o_O(function*(jsonUrl) {
+    var cb = o_C();
     request(jsonUrl, cb);
     var data = yield cb;
-    cb = oC();
+    cb = o_C();
     fs.writeFile('/path/to/my/file.json', data, cb);
     yield cb;
 });
@@ -135,7 +135,7 @@ monocle.run(function*() {
 ```
 
 The way it works is that first we create a special callback to be used in the
-library method. We do this by calling `monocle.callback()` or `monocle.oC()`
+library method. We do this by calling `monocle.callback()` or `monocle.o_C()`
 for short. This creates a callback we pass to the asynchronous method. Then, on
 the next line, we simply `yield` to the callback, which blocks execution until
 the asynchronous method is done and we have a result. Using this strategy, it's
@@ -197,3 +197,14 @@ Monocle-enabled libraries
 A list of Node libraries that export o-routines:
 
 * [Yiewd](https://github.com/jlipps/yiewd)
+
+Fashion
+-------
+One of the awesome things about the [original
+monocle](https://github.com/saucelabs/monocle) was that the decorator (`@_o`) looked like a monocle-bearing individual! We can't start names with `@` in Javascript, hence the use of `o_O` in the port. But we have options. These are all exported for your particular taste:
+
+```
+monocle.o0
+monocle.o_0
+monocle.oO
+```

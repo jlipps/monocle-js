@@ -1,24 +1,24 @@
 /*global it:true, describe:true */
 "use strict";
 var monocle = require('../lib/monocle')
-  , o0 = monocle.o0
+  , o_O = monocle.o_O
   , launch = monocle.launch
   , run = monocle.run
   , Return = monocle.Return
-  , oC = monocle.callback
+  , o_C = monocle.callback
   , should = require('should');
 
-var sleep = o0(function*(secs) {
-  var cb = oC();
+var sleep = o_O(function*(secs) {
+  var cb = o_C();
   setTimeout(cb, secs * 1000);
   yield cb;
 });
 
-var square = o0(function*(x) {
+var square = o_O(function*(x) {
   yield x * x;
 });
 
-var cube = o0(function*(x) {
+var cube = o_O(function*(x) {
   var squareOfX = yield square(x);
   yield x * squareOfX;
 });
@@ -26,7 +26,7 @@ var cube = o0(function*(x) {
 describe('monocle', function() {
   it('should not reach code after returns', function(done) {
     var shouldntChange = "foo";
-    var square = o0(function*(x) {
+    var square = o_O(function*(x) {
       yield new Return(x * x);
       shouldntChange = "bar";
     });
@@ -50,8 +50,8 @@ describe('monocle', function() {
   });
 
   it('should work with new asynchronously', function(done) {
-    var f1 = o0(function*() {
-      var cb = oC();
+    var f1 = o_O(function*() {
+      var cb = o_C();
       setTimeout(cb, 500);
       yield cb;
     });
@@ -65,11 +65,11 @@ describe('monocle', function() {
 
   it('should catch exceptions and exit oroutine', function(done) {
     var shouldntChange = "foo";
-    var fail1 = o0(function*() {
+    var fail1 = o_O(function*() {
       throw new Error("foo bar baz");
       shouldntChange = "bar";
     });
-    var fail2 = o0(function*() {
+    var fail2 = o_O(function*() {
       yield fail1();
     });
     run(function*() {
@@ -91,12 +91,12 @@ describe('monocle', function() {
     var errInAsync = function(cb) {
       cb(new Error("foo bar baz"));
     };
-    var fail1 = o0(function*() {
-      var cb = oC();
+    var fail1 = o_O(function*() {
+      var cb = o_C();
       errInAsync(cb);
       yield cb;
     });
-    var fail2 = o0(function*() {
+    var fail2 = o_O(function*() {
       yield fail1();
     });
     run(function*() {
@@ -114,7 +114,7 @@ describe('monocle', function() {
   });
 
   it('should work with launch', function(done) {
-    launch(o0(function*() {
+    launch(o_O(function*() {
       var x = yield square(5);
       x.should.equal(25);
       done();
@@ -130,7 +130,7 @@ describe('monocle', function() {
   });
 
   it('should pass multiple parameters to o-routine', function(done) {
-    var add = o0(function*(x, y) {
+    var add = o_O(function*(x, y) {
       yield x + y;
     });
     run(function*() {
@@ -147,8 +147,8 @@ describe('monocle', function() {
       }
       cb(null, "yay!");
     };
-    var syncFn = o0(function*(shouldErr) {
-      var cb = oC();
+    var syncFn = o_O(function*(shouldErr) {
+      var cb = o_C();
       asyncFn(shouldErr, cb);
       yield (yield cb);
     });
@@ -172,7 +172,7 @@ describe('monocle', function() {
       foo: 'bar'
     };
 
-    bindObj.gen = o0(function*() {
+    bindObj.gen = o_O(function*() {
       yield this.foo;
     });
 
@@ -187,7 +187,7 @@ describe('monocle', function() {
     var MyClass = function() {
       this.foo = 'bar';
     };
-    MyClass.prototype.myOroutine = o0(function*() {
+    MyClass.prototype.myOroutine = o_O(function*() {
       var s = yield square(3);
       yield this.foo + ' ' + s;
     });
