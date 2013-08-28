@@ -165,6 +165,18 @@ finished, and give me the result". In the third line, we use yield not as a way
 to wait but as a way to "return" a value from the o-routine. In this sense,
 we're using "yield as in crops", not as in traffic.
 
+Enabling Javascript generators
+----------------
+By default, generators are not enabled in the V8 Javascript engine which powers Node. In Node 11, generators are available but not enabled unless you pass the `--harmony` flag. If you're using Monocle.js, make sure to do that!
+
+Running tests
+-------------
+Monocle's tests are written in Mocha. Simply run this command:
+
+```bash
+mocha --harmony test/
+```
+
 Case study
 ----------
 I ported Monocle.js for use in [Yiewd](https://github.com/jlipps/yiewd),
