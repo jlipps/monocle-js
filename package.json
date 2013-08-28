@@ -1,13 +1,14 @@
 {
   "name": "monocle.js",
-  "description": "Blocking syntax using generators. Port of sah/monocle",
+  "description": "Blocking-like syntax for asynchronous Javascript libraries, using generators. Port of https://github.com/saucelabs/monocle",
   "tags": [
     "javascript",
     "generators",
+    "yield",
     "async",
     "sync"
   ],
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "jlipps@gmail.com",
   "repository": {
     "type": "git",

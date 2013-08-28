@@ -86,17 +86,8 @@ handled appropriately.
 It's important to understand that Monocle methods cannot simply be called like
 normal functions--to actually begin executing them, pass them as arguments to
 `monocle.launch`. There's also a convenience method for launching a monoclized
-generator directly:
-
-```js
-monocle.run = function(generator) {
-    var monoclizedFunc = o0(generator);
-    monocle.launch(monoclizedFunc);
-};
-```
-
-With `monocle.run`, you can avoid having to define a `main` function in the
-example above:
+generator directly: `monocle.run`. With `monocle.run`, you can avoid having to
+define a `main` function in the example above, like so:
 
 ```js
 monocle.run(function*() {
