@@ -1,33 +1,28 @@
 /*global it:true, describe:true */
 "use strict";
-var monocle = require('../lib/monocle')
+var monocle = require('../lib/main')
   , o_O = monocle.o_O
   , launch = monocle.launch
   , run = monocle.run
   , Return = monocle.Return
   , o_C = monocle.callback
+  , sleep = monocle.utils.sleep
   , should = require('should');
 
-var sleep = o_O(function*(secs) {
-  var cb = o_C();
-  setTimeout(cb, secs * 1000);
-  yield cb;
-});
-
 var square = o_O(function*(x) {
-  yield x * x;
+  return x * x;
 });
 
 var cube = o_O(function*(x) {
   var squareOfX = yield square(x);
-  yield x * squareOfX;
+  return x * squareOfX;
 });
 
 describe('monocle', function() {
   it('should not reach code after returns', function(done) {
     var shouldntChange = "foo";
     var square = o_O(function*(x) {
-      yield new Return(x * x);
+      return x * x;
       shouldntChange = "bar";
     });
     run(function*() {
@@ -38,18 +33,36 @@ describe('monocle', function() {
     });
   });
 
-  it('should work without new', function(done) {
+  it('should not yield anything other than callbacks', function(done) {
+    var badYield = o_O(function*() {
+      var s = yield square(3);
+      yield s;
+    });
     run(function*() {
-      var s = yield square(4);
-      s.should.equal(16);
-      var start = Date.now();
-      yield sleep(0.5);
-      (Date.now() - start).should.be.above(499);
+      var err;
+      try {
+        var s = yield badYield();
+      } catch (e) {
+        err = e;
+      }
+      should.exist(err);
+      err.message.should.include("o-routines can only yield callbacks");
       done();
     });
   });
 
-  it('should work with new asynchronously', function(done) {
+  it('should yield undefined as default return', function(done) {
+    var f = o_O(function*() {
+      yield sleep(0.1);
+    });
+    run(function*() {
+      var res = yield f();
+      (typeof res).should.equal("undefined");
+      done();
+    });
+  });
+
+  it('should work with async methods', function(done) {
     var f1 = o_O(function*() {
       var cb = o_C();
       setTimeout(cb, 500);
@@ -131,7 +144,7 @@ describe('monocle', function() {
 
   it('should pass multiple parameters to o-routine', function(done) {
     var add = o_O(function*(x, y) {
-      yield x + y;
+      return x + y;
     });
     run(function*() {
       var sum = yield add(3, 6);
@@ -150,7 +163,7 @@ describe('monocle', function() {
     var syncFn = o_O(function*(shouldErr) {
       var cb = o_C();
       asyncFn(shouldErr, cb);
-      yield (yield cb);
+      return (yield cb);
     });
     run(function*() {
       var res = yield syncFn(false);
@@ -173,7 +186,7 @@ describe('monocle', function() {
     };
 
     bindObj.gen = o_O(function*() {
-      yield this.foo;
+      return this.foo;
     });
 
     run(function*() {
@@ -189,7 +202,7 @@ describe('monocle', function() {
     };
     MyClass.prototype.myOroutine = o_O(function*() {
       var s = yield square(3);
-      yield this.foo + ' ' + s;
+      return this.foo + ' ' + s;
     });
     MyClass.prototype.run = function(gen) {
       run(gen, this);

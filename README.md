@@ -58,7 +58,7 @@ var request = require('request.monocle')
 var myLibraryFunction = o_O(function*(jsonUrl) {
     var data = yield request(jsonUrl);
     yield fs.writeFile('/path/to/my/file.json', data);
-    yield data;
+    return data;
 });
 
 var main = o_O(function*() {
@@ -93,8 +93,9 @@ define a `main` function in the example above, like so:
 ```js
 monocle.run(function*() {
     try {
-        yield myLibraryFunction('http://somesite.com/json/data');
+        var data = yield myLibraryFunction('http://somesite.com/json/data');
         console.log("Downloading and writing file was successful!");
+        console.log(data);
     } catch (err) {
         console.log("Downloading and writing file failed!");
     }
@@ -123,12 +124,14 @@ var myLibraryFunction = o_O(function*(jsonUrl) {
     cb = o_C();
     fs.writeFile('/path/to/my/file.json', data, cb);
     yield cb;
+    return data;
 });
 
 monocle.run(function*() {
     try {
-        yield myLibraryFunction('http://somesite.com/json/data');
+        var data = yield myLibraryFunction('http://somesite.com/json/data');
         console.log("Downloading and writing file was successful!");
+        console.log(data);
     } catch (err) {
         console.log("Downloading and writing file failed!");
     }
@@ -146,25 +149,58 @@ Functions which have been monoclized are called 'o-routines', and, from within
 other o-routines, can simply be yielded to without creating a callback. This is
 why we simply `yield myLibraryFunction(jsonUrl)` in the example above.
 
-A tale of two yields
+Yield! As in traffic
 -------------------
-Reading through the examples above, you'll notice that we're using `yield` in
-two ways, exemplified in these three lines:
+Reading through the examples above, you may have noticed that we're using
+`yield` in an interesting way. In a typical Javascript generator, `yield` is
+used to send data from the generator to the caller of `next()`. You could think
+of this as "yield as in crops". In Monocle, `yield` is a sign that we should
+wait for the result of an asynchronous function. It's much better to think of
+this as "yield as in traffic" (hat tip to [the other
+monocle](https://github.com/saucelabs/monocle) for this explanation). Take
+a look at this code from the example above:
 
 ```js
 var data = yield request(jsonUrl);
 yield fs.writeFile('/path/to/my/file.json', data);
-yield data;
+return data;
 ```
 
 In the first line, we're using yield as a way to retrieve the result of an
-asynchronous function. This is (hat tip to [the other
-monocle](https://github.com/saucelabs/monocle)) "yield as in traffic". In the
-second line, we're doing the same thing, only we're not assigning the result to
-anything. These lines essentially say, "wait until the asynchronous process is
-finished, and give me the result". In the third line, we use yield not as a way
-to wait but as a way to "return" a value from the o-routine. In this sense,
-we're using "yield as in crops", not as in traffic.
+asynchronous o-routine called `request`. This is what we mean by "yield as in
+traffic". In the second line, we're doing the same kind of thing, only we're
+not assigning the result to anything. These lines essentially say, "wait until
+the asynchronous process is finished, and give me the result".
+
+The third line, using the `return` statement, is how we actually send a result
+back to whoever is calling this particular function. So, the rule of thumb is
+this:
+
+* `yield` when you want to wait for an o-routine or a callback and get its result
+* `return` when you want to send back the result of an o-routine
+
+Because of these semantics, Monocle checks to make sure the only type of thing
+you're yielding is an o-routine or callback. See the examples below:
+
+```js
+var myFunc = o_O(function*() {
+    // this is good, monocle.utils.sleep is an o-routine
+    yield monocle.utils.sleep(1);
+
+    // this is good, cb is a monocle callback
+    var cb = o_C();
+    setTimeout(cb, 1000);
+    yield cb;
+
+    // this is bad, we should be returning instead; Math.pow is not an o-routine.
+    // Monocle will throw an error
+    yield Math.pow(2, 3);
+
+    // this is bad, we should be returning instead.
+    // Monocle will throw an error
+    yield 5;
+});
+```
 
 Enabling Javascript generators
 ----------------
