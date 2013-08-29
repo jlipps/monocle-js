@@ -225,4 +225,14 @@ describe('monocle', function() {
       done();
     });
   });
+
+  it('should defer non-generator "o-routines"', function(done) {
+    var notAGenerator = o_O(function() {
+      return 'foo';
+    });
+    run(function*() {
+      (yield notAGenerator()).should.equal("foo");
+      done();
+    });
+  });
 });
