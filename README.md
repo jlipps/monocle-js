@@ -21,25 +21,26 @@ var request = require('request')
   , fs = require('fs');
 
 var myLibraryFunction = function(jsonUrl, cb) {
-    request(jsonUrl, function(err, data) {
+    request(jsonUrl, function(err, resp, body) {
         if (err) {
             return cb(err);
         }
-        fs.writeFile('/path/to/my/file.json', data, function(err) {
+        fs.writeFile('/path/to/my/file.json', body, function(err) {
             if (err) {
                 return cb(err);
             }
-            cb(null, data);
+            cb(null, resp, body);
         });
     });
 };
 
-myLibraryFunction('http://somesite.com/json/data', function(err, data) {
+myLibraryFunction('http://somesite.com/json/data', function(err, resp, body) {
     if (err) {
         console.log("Downloading and writing file failed!");
     } else {
         console.log("Downloading and writing file was successful!");
-        console.log(data);
+        console.log(resp);
+        console.log(body);
     }
 };
 ```
@@ -50,14 +51,14 @@ project-speciic functionality, you often find yourself doing this in Node.
 Here's what the same code could look like using Monocle:
 
 ```js
-var request = require('request.monocle')
-  , fs = require('fs.monocle')
+var request = require('monocle-fs')
+  , fs = require('monocle-fs')
   , monocle = require('monocle.js')
   , o_O = monocle.o_O;
 
 var myLibraryFunction = o_O(function*(jsonUrl) {
     var data = yield request(jsonUrl);
-    yield fs.writeFile('/path/to/my/file.json', data);
+    yield fs.writeFile('/path/to/my/file.json', data[1]);
     return data;
 });
 
@@ -65,7 +66,8 @@ var main = o_O(function*() {
     try {
         var data = yield myLibraryFunction('http://somesite.com/json/data');
         console.log("Downloading and writing file was successful!");
-        console.log(data);
+        console.log(data[0]);
+        console.log(data[1]);
     } catch (err) {
         console.log("Downloading and writing file failed!");
     }
@@ -95,7 +97,8 @@ monocle.run(function*() {
     try {
         var data = yield myLibraryFunction('http://somesite.com/json/data');
         console.log("Downloading and writing file was successful!");
-        console.log(data);
+        console.log(data[0]);
+        console.log(data[1]);
     } catch (err) {
         console.log("Downloading and writing file failed!");
     }
@@ -104,11 +107,11 @@ monocle.run(function*() {
 
 Using callback-based methods
 --------------------
-Of course, in the previous examples, I've required `fs.monocle` and
-`request.monocle`, libraries which don't actually exist yet. What if you want
-to make use of arbitrary callback-based library methods? You can do that with
-Monocle as well. Here's the previous example without the assumption that
-`request` and `fs` have already been 'monoclized'.
+Of course, in the previous examples, I've required `monocle-fs` and
+`monocle-request`, libraries which didn't exist until I created them. What if
+you want to make use of arbitrary callback-based library methods? You can do
+that with Monocle as well. Here's the previous example without the assumption
+that `request` and `fs` have already been 'monoclized'.
 
 ```js
 var request = require('request')
@@ -122,7 +125,7 @@ var myLibraryFunction = o_O(function*(jsonUrl) {
     request(jsonUrl, cb);
     var data = yield cb;
     cb = o_C();
-    fs.writeFile('/path/to/my/file.json', data, cb);
+    fs.writeFile('/path/to/my/file.json', data[1], cb);
     yield cb;
     return data;
 });
@@ -131,7 +134,8 @@ monocle.run(function*() {
     try {
         var data = yield myLibraryFunction('http://somesite.com/json/data');
         console.log("Downloading and writing file was successful!");
-        console.log(data);
+        console.log(data[0]);
+        console.log(data[1]);
     } catch (err) {
         console.log("Downloading and writing file failed!");
     }
@@ -162,7 +166,7 @@ a look at this code from the example above:
 
 ```js
 var data = yield request(jsonUrl);
-yield fs.writeFile('/path/to/my/file.json', data);
+yield fs.writeFile('/path/to/my/file.json', data[1]);
 return data;
 ```
 
@@ -234,6 +238,8 @@ Monocle-enabled libraries
 A list of Node libraries that export o-routines:
 
 * [Yiewd](https://github.com/jlipps/yiewd)
+* [monocle-fs](https://github.com/jlipps/monocle-fs)
+* [monocle-request](https://github.com/jlipps/monocle-request)
 
 Fashion
 -------
