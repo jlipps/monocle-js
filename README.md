@@ -206,6 +206,46 @@ var myFunc = o_O(function*() {
 });
 ```
 
+Porting async libraries
+-----------------------
+We saw above how to make use of pre-existing async functions in o-routines,
+using monocle callbacks. Monocle also provides a helper function which can be
+used to turn a node-style async function into an o-routine automatically:
+`monocle.monoclize()`. By "node-style async function", I mean one which takes
+a series of parameters, the last of which is a callback. Monocle assumes this
+callback takes at least two parameters: the first of which an error object (or
+`null`) used to determine whether the original function completed successfully.
+
+Let's look at an example. `fs.readFile()` is a node-style async function. We
+can convert it into an o-routine like this:
+
+```js
+var monocle = require('monocle.js')
+  , o_O = monocle.o_O
+  , o_C = monocle.o_C
+  , fs = require('fs');
+
+var monoclizedRead = o_O(function*(filePath) {
+    var cb = o_C();
+    fs.readFile(filePath, cb);
+    return (yield cb);
+});
+```
+
+We can eliminate this boilerplate by using `monoclize()`:
+
+```js
+var monocle = require('monocle.js')
+  , o_O = monocle.o_O
+  , monoclize = monocle.monoclize
+  , fs = require('fs');
+
+var monoclizedRead = monoclize(fs.readFile);
+```
+
+For an example of how this is used to port entire Node libraries, check out
+[monocle-fs](https://github.com/jlipps/monocle-fs).
+
 Enabling Javascript generators
 ----------------
 By default, generators are not enabled in the V8 Javascript engine which powers
