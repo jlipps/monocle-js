@@ -155,10 +155,12 @@ describe('monocle', function() {
 
   it('should handle converting node-style async err handling', function(done) {
     var asyncFn = function(shouldErr, cb) {
-      if (shouldErr) {
-        return cb(new Error("bad"));
-      }
-      cb(null, "yay!");
+      setTimeout(function() {
+        if (shouldErr) {
+          return cb(new Error("bad"));
+        }
+        cb(null, "yay!");
+      }, 500);
     };
     var syncFn = o_O(function*(shouldErr) {
       var cb = o_C();
