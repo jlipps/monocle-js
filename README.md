@@ -51,7 +51,7 @@ project-speciic functionality, you often find yourself doing this in Node.
 Here's what the same code could look like using Monocle:
 
 ```js
-var request = require('monocle-fs')
+var request = require('monocle-request')
   , fs = require('monocle-fs')
   , monocle = require('monocle.js')
   , o_O = monocle.o_O;
