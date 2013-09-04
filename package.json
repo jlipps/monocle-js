@@ -1,5 +1,5 @@
 {
-  "name": "monocle.js",
+  "name": "monocle-js",
   "description": "Blocking-like syntax for asynchronous Javascript libraries, using generators. Port of https://github.com/saucelabs/monocle",
   "tags": [
     "javascript",
@@ -8,7 +8,7 @@
     "async",
     "sync"
   ],
-  "version": "0.1.3",
+  "version": "0.1.4",
   "author": "jlipps@gmail.com",
   "repository": {
     "type": "git",

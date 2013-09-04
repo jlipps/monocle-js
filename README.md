@@ -1,13 +1,13 @@
-Monocle.js
+monocle-js
 ==========
 
-Monocle.js is a Node library for using a blocking-like syntax when writing
+monocle-js is a Node library for using a blocking-like syntax when writing
 asynchronous code. In other words, it's one way to avoid the 'callback hell' so
 many Javascript developers love to hate. It's a port of the
 [Monocle](https://github.com/saucelabs/monocle) library for event-driven
 Python, made possible by ES6's new generators and the `yield` keyword.
 
-Install with: `npm install monocle.js`
+Install with: `npm install monocle-js`
 
 The problem
 -----------
@@ -53,7 +53,7 @@ Here's what the same code could look like using Monocle:
 ```js
 var request = require('monocle-request')
   , fs = require('monocle-fs')
-  , monocle = require('monocle.js')
+  , monocle = require('monocle-js')
   , o_O = monocle.o_O;
 
 var myLibraryFunction = o_O(function*(jsonUrl) {
@@ -116,7 +116,7 @@ that `request` and `fs` have already been 'monoclized'.
 ```js
 var request = require('request')
   , fs = require('fs')
-  , monocle = require('monocle.js')
+  , monocle = require('monocle-js')
   , o_O = monocle.o_O;
   , o_C = monocle.callback;
 
@@ -220,7 +220,7 @@ Let's look at an example. `fs.readFile()` is a node-style async function. We
 can convert it into an o-routine like this:
 
 ```js
-var monocle = require('monocle.js')
+var monocle = require('monocle-js')
   , o_O = monocle.o_O
   , o_C = monocle.o_C
   , fs = require('fs');
@@ -235,7 +235,7 @@ var monoclizedRead = o_O(function*(filePath) {
 We can eliminate this boilerplate by using `monoclize()`:
 
 ```js
-var monocle = require('monocle.js')
+var monocle = require('monocle-js')
   , o_O = monocle.o_O
   , monoclize = monocle.monoclize
   , fs = require('fs');
@@ -250,7 +250,7 @@ Enabling Javascript generators
 ----------------
 By default, generators are not enabled in the V8 Javascript engine which powers
 Node. In Node 11, generators are available but not enabled unless you pass the
-`--harmony` flag. If you're using Monocle.js, make sure to do that!
+`--harmony` flag. If you're using monocle-js, make sure to do that!
 
 Running tests
 -------------
@@ -262,7 +262,7 @@ mocha --harmony test/
 
 Case study
 ----------
-I ported Monocle.js for use in [Yiewd](https://github.com/jlipps/yiewd),
+I ported monocle-js for use in [Yiewd](https://github.com/jlipps/yiewd),
 a generator-based WebDriver client library. All WebDriver calls are HTTP-based,
 and given Node's callback-based HTTP library, WebDriver test code descends
 quickly into callback hell. Yiewd is a good example of how an existing
