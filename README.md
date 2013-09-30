@@ -246,6 +246,51 @@ var monoclizedRead = monoclize(fs.readFile);
 For an example of how this is used to port entire Node libraries, check out
 [monocle-fs](https://github.com/jlipps/monocle-fs).
 
+Running o-routines in parallel
+------------------------------
+Having a blocking syntax is great, but we can also take advantage of the fact
+that we're not really blocking! If we have a bunch of o-routines we want to run
+in parallel, it's really easy:
+
+```js
+var monocle = require('monocle-js')
+  , run = monocle.run
+  , ll = monocle.parallel
+  , sleep = monocle.utils.sleep;
+
+var method1 = o_O(function*() {
+    yield sleep(0.5);
+    console.log("Hello");
+});
+
+var method2 = o_O(function*(sleepTime, text) {
+    yield sleep(sleepTime);
+    console.log(text);
+});
+
+run(function*() {
+    yield ll([
+        method1,
+        [method2, 0.25, "World!"]
+    ]);
+});
+```
+
+In the above example, we have two methods. The first prints out "Hello" after
+waiting half a second. The second prints out arbitrary text after waiting an
+arbitrary amount of time. Using the `parallel` (or `ll`) method, we can run
+both of these simultaneously. Because of this parallelism, the result will
+actually look like this:
+
+```
+World!
+Hello
+```
+
+And, everything will be printed out in half a second, not three quarters of
+a second. You can see in the call how to pass parameters to parallel methods:
+simply wrap the method and it's parameters in an array.
+
 Enabling Javascript generators
 ----------------
 By default, generators are not enabled in the V8 Javascript engine which powers

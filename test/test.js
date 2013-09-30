@@ -250,7 +250,7 @@ describe('monocle', function() {
     });
   });
 
-  it('should allow paralleltaneous execution if desired', function(done) {
+  it('should allow parallel execution', function(done) {
     var f1 = o_O(function*() {
       yield sleep(0.5);
     });
@@ -263,6 +263,33 @@ describe('monocle', function() {
     run(function*() {
       var start = Date.now();
       yield parallel([f1, f2, f3]);
+      var end = Date.now();
+      (end - start).should.be.above(499);
+      (end - start).should.be.below(749);
+      done();
+    });
+  });
+
+  it('should pass parameters to parallel oroutines', function(done) {
+    var f1 = o_O(function*(val) {
+      val.should.equal("1");
+      yield sleep(0.5);
+    });
+    var f2 = o_O(function*(val1, val2) {
+      val1.should.equal("foo");
+      val2.should.equal("bar");
+      yield sleep(0.25);
+    });
+    var f3 = o_O(function*() {
+      arguments.length.should.equal(0);
+      yield sleep(0.33);
+    });
+    var f4 = o_O(function*() {
+      arguments.length.should.equal(0);
+    });
+    run(function*() {
+      var start = Date.now();
+      yield parallel([[f1, "1"], [f2, "foo", "bar"], [f3], f4]);
       var end = Date.now();
       (end - start).should.be.above(499);
       (end - start).should.be.below(749);
