@@ -4,6 +4,7 @@ var monocle = require('../lib/main')
   , o_O = monocle.o_O
   , launch = monocle.launch
   , run = monocle.run
+  , parallel = monocle.parallel
   , Return = monocle.Return
   , o_C = monocle.callback
   , sleep = monocle.utils.sleep
@@ -234,6 +235,37 @@ describe('monocle', function() {
     });
     run(function*() {
       (yield notAGenerator()).should.equal("foo");
+      done();
+    });
+  });
+
+  it('should yield to monocle callbacks', function(done) {
+    run(function*() {
+      var cb = o_C();
+      var start = Date.now();
+      setTimeout(cb, 500);
+      yield cb;
+      (Date.now() - start).should.be.above(499);
+      done();
+    });
+  });
+
+  it('should allow paralleltaneous execution if desired', function(done) {
+    var f1 = o_O(function*() {
+      yield sleep(0.5);
+    });
+    var f2 = o_O(function*() {
+      yield sleep(0.25);
+    });
+    var f3 = o_O(function*() {
+      yield sleep(0.33);
+    });
+    run(function*() {
+      var start = Date.now();
+      yield parallel([f1, f2, f3]);
+      var end = Date.now();
+      (end - start).should.be.above(499);
+      (end - start).should.be.below(749);
       done();
     });
   });
