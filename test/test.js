@@ -72,7 +72,7 @@ describe('monocle', function() {
     run(function*() {
       var start = Date.now();
       yield f1();
-      (Date.now() - start).should.be.above(499);
+      (Date.now() - start).should.be.above(490);
       done();
     });
   });
@@ -245,7 +245,7 @@ describe('monocle', function() {
       var start = Date.now();
       setTimeout(cb, 500);
       yield cb;
-      (Date.now() - start).should.be.above(499);
+      (Date.now() - start).should.be.above(490);
       done();
     });
   });
@@ -264,7 +264,7 @@ describe('monocle', function() {
       var start = Date.now();
       yield parallel([f1, f2, f3]);
       var end = Date.now();
-      (end - start).should.be.above(499);
+      (end - start).should.be.above(490);
       (end - start).should.be.below(749);
       done();
     });
@@ -291,8 +291,72 @@ describe('monocle', function() {
       var start = Date.now();
       yield parallel([[f1, "1"], [f2, "foo", "bar"], [f3], f4]);
       var end = Date.now();
-      (end - start).should.be.above(499);
-      (end - start).should.be.below(749);
+      (end - start).should.be.above(490);
+      (end - start).should.be.below(740);
+      done();
+    });
+  });
+
+  it('should return values from parallel oroutines', function(done) {
+    var f1 = o_O(function*(val) {
+      val.should.equal("1");
+      yield sleep(0.5);
+      return 'a';
+    });
+    var f2 = o_O(function*(val1, val2) {
+      val1.should.equal("foo");
+      val2.should.equal("bar");
+      yield sleep(0.25);
+      return 'b';
+    });
+    var f3 = o_O(function*() {
+      arguments.length.should.equal(0);
+      yield sleep(0.33);
+    });
+    run(function*() {
+      var start = Date.now();
+      var res = yield parallel([[f1, "1"], [f2, "foo", "bar"], f3]);
+      var end = Date.now();
+      (end - start).should.be.above(490);
+      (end - start).should.be.below(740);
+      res.should.eql(["a", "b", undefined]);
+      done();
+    });
+  });
+
+  it('should not swallow errors in run', function(done) {
+    var f1 = o_O(function*() {
+      throw new Error('oh noes!');
+    });
+    var err;
+    try {
+      run(function*() {
+        yield f1();
+      });
+    } catch (e) {
+      err = e;
+    }
+    should.exist(err);
+    err.message.should.equal('oh noes!');
+    done();
+  });
+
+  it('should not swallow errors in parallel', function(done) {
+    var f1 = o_O(function*() {
+      throw new Error('oh noes!');
+    });
+    var err;
+    run(function*() {
+      var start = Date.now();
+      try {
+        yield parallel([f1, [sleep, 0.25]]);
+      } catch (e) {
+        err = e;
+      }
+      (Date.now() - start).should.be.above(240);
+      should.exist(err);
+      err.message.should.include('One or more');
+      err.allErrors[0].message.should.eql('oh noes!');
       done();
     });
   });
