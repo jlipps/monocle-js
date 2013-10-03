@@ -1,6 +1,7 @@
 /*global it:true, describe:true */
 "use strict";
 var monocle = require('../lib/main')
+  , _ = require('underscore')
   , o_O = monocle.o_O
   , launch = monocle.launch
   , run = monocle.run
@@ -121,6 +122,36 @@ describe('monocle', function() {
         err = e;
       }
       should.exist(err);
+      err.message.should.equal("foo bar baz");
+      shouldntChange.should.equal("foo");
+      done();
+    });
+  });
+
+  it('should have clean error traces', function(done) {
+    var shouldntChange = "foo";
+    var errInAsync = function(cb) {
+      cb(new Error("foo bar baz"));
+    };
+    var fail1 = o_O(function*() {
+      var cb = o_C();
+      errInAsync(cb);
+      yield cb;
+    });
+    var fail2 = o_O(function*() {
+      yield fail1();
+    });
+    run(function*() {
+      var err;
+      try {
+        yield fail2();
+      } catch(e) {
+        err = e;
+      }
+      should.exist(err);
+      var re = new RegExp("monocle\.js", "g");
+      var matches = re.exec(err.stack);
+      matches.length.should.not.be.above(1);
       err.message.should.equal("foo bar baz");
       shouldntChange.should.equal("foo");
       done();
