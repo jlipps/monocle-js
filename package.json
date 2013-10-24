@@ -28,7 +28,7 @@
     "underscore": "~1.4.3"
   },
   "scripts": {
-    "test": "grunt test"
+    "test": "mocha --harmony -t 3000 -R spec test/"
   },
   "devDependencies": {
     "mocha": "~1.8.1",
