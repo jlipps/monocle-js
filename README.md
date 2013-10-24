@@ -1,6 +1,8 @@
 monocle-js
 ==========
 
+[![Build Status](https://travis-ci.org/jlipps/monocle-js.png)](https://travis-ci.org/jlipps/monocle-js)
+
 monocle-js is a Node library for using a blocking-like syntax when writing
 asynchronous code. In other words, it's one way to avoid the 'callback hell' so
 many Javascript developers love to hate. It's a port of the
