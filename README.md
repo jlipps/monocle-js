@@ -246,6 +246,53 @@ var monoclizedRead = monoclize(fs.readFile);
 For an example of how this is used to port entire Node libraries, check out
 [monocle-fs](https://github.com/jlipps/monocle-fs).
 
+Using Promises
+--------------
+[Promises](http://promises-aplus.github.io/promises-spec/) are another way of
+handling asynchronous control flow in Javascript. There are many popular
+promises implementations, including [Q](https://github.com/kriskowal/q) and
+[Bluebird](https://github.com/petkaantonov/bluebird). Library methods which
+return promises can be used without modification in Monocle. For example,
+here's a bit of functional testing code using
+[Wd.js](https://github.com/admc/wd)'s promise library:
+
+```js
+var wd = require('wd')
+  , browser = wd.promiseRemote();
+
+browser
+    .init({ browserName: 'chrome' })
+    .then(function () {
+        return browser.get("http://admc.io/wd/test-pages/guinea-pig.html");
+    })
+    .then(function () { return browser.title();})
+    .then(function (title) {
+        title.should.equal('I am a page title - Sauce Labs');
+    })
+    .fin(function () { browser.quit(); })
+    .done();
+```
+
+This code opens up a Chrome browser, navigates to a URL, and asserts that the
+title is as expected. We could rewrite this using Monocle as follows:
+
+```js
+var wd = require('wd')
+  , run = require('monocle-js').run
+  , browser = wd.promiseRemote();
+
+run(function*() {
+    yield browser.init({ browserName: 'chrome' });
+    yield browser.get("http://admc.io/wd/test-pages/guinea-pig.html");
+    var title = yield browser.title();
+    title.should.equal('I am a page title - Sauce Labs');
+    yield browser.quit();
+});
+```
+
+Many libraries exist which make use of promises, and Monocle makes it easy to
+take advantage of them in a more streamlined and elegant fashion.
+
 Running o-routines in parallel
 ------------------------------
 Having a blocking syntax is great, but we can also take advantage of the fact

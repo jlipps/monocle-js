@@ -5,6 +5,7 @@ var monocle = require('../lib/main')
   , o_O = monocle.o_O
   , launch = monocle.launch
   , run = monocle.run
+  , Q = require("q")
   , parallel = monocle.parallel
   , Return = monocle.Return
   , o_C = monocle.callback
@@ -19,6 +20,18 @@ var cube = o_O(function*(x) {
   var squareOfX = yield square(x);
   return x * squareOfX;
 });
+
+var promiseSleep = function(ms, shouldThrow) {
+  var deferred = Q.defer();
+  setTimeout(function() {
+    if (shouldThrow) {
+      deferred.reject(new Error("sleeping sucks!"));
+    } else {
+      deferred.resolve(ms);
+    }
+  }, ms);
+  return deferred.promise;
+};
 
 describe('monocle', function() {
   it('should not reach code after returns', function(done) {
@@ -388,6 +401,44 @@ describe('monocle', function() {
       should.exist(err);
       err.message.should.include('One or more');
       err.allErrors[0].message.should.eql('oh noes!');
+      done();
+    });
+  });
+
+  it('should work out of the box with promises', function(done) {
+    run(function*() {
+      var start = Date.now();
+      yield promiseSleep(100);
+      yield promiseSleep(200);
+      yield promiseSleep(50);
+      (Date.now() - start).should.be.above(349);
+      done();
+    });
+  });
+
+  it('should return promise resolutions', function(done) {
+    run(function*() {
+      var start = Date.now();
+      var timeSlept = yield promiseSleep(50);
+      (Date.now() - start).should.be.above(49);
+      timeSlept.should.equal(50);
+      done();
+    });
+  });
+
+  it('should handle promise errors', function(done) {
+    run(function*() {
+      var start = Date.now();
+      var err;
+      try {
+        yield promiseSleep(100, true);
+        yield promiseSleep(200);
+      } catch (e) {
+        err = e;
+      }
+      should.exist(err);
+      (Date.now() - start).should.be.below(149);
+      err.message.should.include('sleeping');
       done();
     });
   });
