@@ -368,7 +368,7 @@ describe('monocle', function() {
     });
   });
 
-  it('should not swallow errors in run', function(done) {
+  it('should not swallow errors in run (oroutine)', function(done) {
     var f1 = o_O(function*() {
       throw new Error('oh noes!');
     });
@@ -382,6 +382,20 @@ describe('monocle', function() {
     }
     should.exist(err);
     err.message.should.equal('oh noes!');
+    done();
+  });
+
+  it('should not swallow errors in run (local)', function(done) {
+    var err;
+    try {
+      run(function*() {
+        throw new Error("foobar!");
+      });
+    } catch (e) {
+      err = e;
+    }
+    should.exist(err);
+    err.message.should.equal('foobar!');
     done();
   });
 
