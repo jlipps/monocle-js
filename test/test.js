@@ -3,6 +3,7 @@
 var monocle = require('../lib/main')
   , _ = require('underscore')
   , o_O = monocle.o_O
+  , o_P = monocle.o_P
   , launch = monocle.launch
   , run = monocle.run
   , Q = require("q")
@@ -455,5 +456,55 @@ describe('monocle', function() {
       err.message.should.include('sleeping');
       done();
     });
+  });
+
+  describe('chaining callbacks', function() {
+    var Clazz = function(initStr) {
+      this.data = initStr || '';
+    };
+    Clazz.prototype.getString = function() {
+      return this.data;
+    };
+    Clazz.prototype.f1 = o_P(function*(s) {
+      yield sleep(0.25);
+      this.data += "f1:" + s;
+      return this;
+    }, ['data']);
+    Clazz.prototype.f2 = o_O(function*(s) {
+      yield sleep(0.25);
+      this.data += "f2::" + s + s;
+      return this;
+    });
+    Clazz.prototype.f3 = o_O(function*(s) {
+      yield sleep(0.25);
+      this.data += "f3:::" + s + s + s;
+      return this.data;
+    });
+    Clazz.prototype.f4 = o_O(function*(s) {
+      yield sleep(0.25);
+      return [new Clazz(s), new Clazz(s), this];
+    });
+
+    it('should chain method calls', function(done) {
+      run(function*() {
+        var obj = new Clazz();
+        var res = yield obj.f1('a').f2('b').f3('c');
+        res.should.equal("f1:af2::bbf3:::ccc");
+        done();
+      });
+    });
+
+    it('should chain properties as well', function(done) {
+      run(function*() {
+        var obj = new Clazz();
+        var obj2 = new Clazz();
+        var res1 = yield obj.f1('a').f4('newguys')[1].f3('b');
+        res1.should.equal("newguysf3:::bbb");
+        var res2 = yield obj2.f1('a').f4('lol')[2].f2('b').data;
+        res2.should.equal("f1:af2::bb");
+        done();
+      });
+    });
+
   });
 });

@@ -340,11 +340,65 @@ And, everything will be printed out in half a second, not three quarters of
 a second. You can see in the call how to pass parameters to parallel methods:
 simply wrap the method and it's parameters in an array.
 
+Chaining o-routines
+-------------------
+It's common practice in Javascript to run asynchronous methods on the results
+of other asynchronous methods. This can be visualized like a chain:
+
+```
+obj1.foo() --> obj2
+  obj2.bar() --> obj3
+    obj3.baz() --> result
+```
+
+Or in code:
+
+```js
+var result = obj1.foo().bar().baz()
+```
+
+Of course, if `foo`, `bar`, and `baz` are asynchronous, this would really look
+like:
+
+```js
+obj1.foo(function(err, obj2) {
+    obj2.bar(function(err, obj3) {
+        obj3.baz(function(err, result) {
+            // do something with result
+        });
+    });
+});
+```
+
+Out of the box, Monocle makes this easier, but we still have to yield each call
+separately, since they're each going to be o-routines:
+
+```js
+var result = yield (yield (yield obj1.foo()).bar()).baz();
+```
+
+This can admittedly get a bit ugly. However, if we define `foo` as a chainable
+o-routine, then we can get around this limitation:
+
+```js
+Clazz.prototype.foo = monocle.chainable(function*() {
+    // do some stuff
+    return objWithBarMethod;
+});
+
+var obj1 = new Clazz();
+var result = yield obj1.foo().bar();
+```
+
+All that matters is that the first function be defined as `chainable`. There's
+also a nice alias for `monocle.chainable`: `o_P`;
+
 Enabling Javascript generators
 ----------------
-By default, generators are not enabled in the V8 Javascript engine which powers
-Node. In Node 11, generators are available but not enabled unless you pass the
-`--harmony` flag. If you're using monocle-js, make sure to do that!
+By default, generators and proxies (used for chaining) are not enabled in the
+V8 Javascript engine which powers Node. In Node 11, generators are available
+but not enabled unless you pass the `--harmony` flag. If you're using
+monocle-js, make sure to do that!
 
 Running tests
 -------------
@@ -384,4 +438,5 @@ monocle](https://github.com/saucelabs/monocle) was that the decorator (`@_o`) lo
 monocle.o0
 monocle.o_0
 monocle.oO
+monocle.o_P  // for chaining
 ```
