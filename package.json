@@ -29,10 +29,11 @@
     "harmony-reflect": "~0.0.11"
   },
   "scripts": {
-    "test": "mocha --harmony -t 3000 -R spec test/ && mocha -t 3000 -R spec test/"
+    "test": "./build.sh && mocha --harmony -t 3000 -R spec test/ && mocha -t 3000 -R spec test/"
   },
   "devDependencies": {
     "mocha": "~1.8.1",
+    "regenerator": "~0.3.3",
     "grunt": "~0.4.0",
     "grunt-cli": "~0.1.6",
     "should": "~1.2.1",
