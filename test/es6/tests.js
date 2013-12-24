@@ -2,7 +2,6 @@
 "use strict";
 
 var monocle = require('../../lib/main.js')
-  , harmony = true
   , _ = require('underscore')
   , o_O = monocle.o_O
   , launch = monocle.launch
@@ -14,7 +13,7 @@ var monocle = require('../../lib/main.js')
   , sleep = monocle.utils.sleep
   , should = require('should');
 
-if (harmony) {
+if (monocle.native) {
   var o_P = monocle.o_P;
 }
 
@@ -39,7 +38,7 @@ var promiseSleep = function(ms, shouldThrow) {
   return deferred.promise;
 };
 
-describe('monocle ' + (harmony ? '(es6)' : '(es5)'), function() {
+describe('monocle ' + (monocle.native ? '(es6)' : '(es5)'), function() {
   it('should not reach code after returns', function(done) {
     var shouldntChange = "foo";
     var square = o_O(function*(x) {
@@ -463,7 +462,7 @@ describe('monocle ' + (harmony ? '(es6)' : '(es5)'), function() {
     });
   });
 
-  if (harmony) {
+  if (monocle.native) {
 
     describe('chaining callbacks', function() {
       var Clazz = function(initStr) {
