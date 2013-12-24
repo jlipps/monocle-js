@@ -7,7 +7,10 @@ monocle-js is a Node library for using a blocking-like syntax when writing
 asynchronous code. In other words, it's one way to avoid the 'callback hell' so
 many Javascript developers love to hate. It's a port of the
 [Monocle](https://github.com/saucelabs/monocle) library for event-driven
-Python, made possible by ES6's new generators and the `yield` keyword.
+Python, made possible by ES6's new generators and the `yield` keyword. (For
+present-day javascript, we use Facebook's
+[Regenerator](https://github.com/facebook/regenerator) to bundle in a generator
+runtime.)
 
 Install with: `npm install monocle-js`
 

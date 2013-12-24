@@ -1,9 +1,4 @@
-/*global it:true, describe:true */
 "use strict";
 
-try {
-  eval("(function*() { yield 1 })()");
-  require('./es6/tests.js');
-} catch (e) {
-  require ('./es5/tests.js');
-}
+var monocle = require('../lib/main.js');
+require('./es' + (monocle.native ? '6' : '5') + '/tests.js');
