@@ -29,7 +29,7 @@
     "harmony-reflect": "~0.0.11"
   },
   "scripts": {
-    "test": "mocha --harmony -t 3000 -R spec test/"
+    "test": "mocha --harmony -t 3000 -R spec test/ && mocha -t 3000 -R spec test/"
   },
   "devDependencies": {
     "mocha": "~1.8.1",
