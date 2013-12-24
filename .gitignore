@@ -1,4 +1,6 @@
 node_modules/
+lib/es5
+test/es5
 lib-cov
 *.seed
 *.log
