@@ -1,7 +1,7 @@
 /*global it:true, describe:true */
 "use strict";
 
-var monocle = require('../../lib/es5/main.js')
+var monocle = require('../../lib/main.js')
   , harmony = false
   , _ = require('underscore')
   , o_O = monocle.o_O

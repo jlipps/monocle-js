@@ -16,6 +16,6 @@ echo "* Clearing out old es5 tests"
 rm -rf test/es5
 mkdir test/es5
 echo "* Regenerating new es5 tests"
-regenerator test/test.js > test/es5/test.js
-sed -i '' -e 's/harmony \= true/harmony = false/' test/es5/test.js
-sed -i '' -e 's/\.\.\/lib\/main/..\/..\/lib\/es5\/main/' test/es5/test.js
+regenerator test/tests.js > test/es5/tests.js
+sed -i '' -e 's/harmony \= true/harmony = false/' test/es5/tests.js
+sed -i '' -e 's/\.\.\/lib\/main/..\/..\/lib\/main/' test/es5/tests.js
