@@ -1,7 +1,7 @@
 /*global it:true, describe:true */
 "use strict";
 
-var monocle = require('../lib/main.js')
+var monocle = require('../../lib/main.js')
   , harmony = true
   , _ = require('underscore')
   , o_O = monocle.o_O
@@ -39,7 +39,7 @@ var promiseSleep = function(ms, shouldThrow) {
   return deferred.promise;
 };
 
-describe('monocle', function() {
+describe('monocle ' + (harmony ? '(es6)' : '(es5)'), function() {
   it('should not reach code after returns', function(done) {
     var shouldntChange = "foo";
     var square = o_O(function*(x) {
