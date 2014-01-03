@@ -2,13 +2,11 @@
 "use strict";
 
 var monocle = require('../../lib/main.js')
-  , _ = require('underscore')
   , o_O = monocle.o_O
   , launch = monocle.launch
   , run = monocle.run
   , Q = require("q")
   , parallel = monocle.parallel
-  , Return = monocle.Return
   , o_C = monocle.callback
   , sleep = monocle.utils.sleep
   , should = require('should');
@@ -61,7 +59,7 @@ describe('monocle ' + (monocle.native ? '(es6)' : '(es5)'), function() {
     run(function*() {
       var err;
       try {
-        var s = yield badYield();
+        yield badYield();
       } catch (e) {
         err = e;
       }
@@ -73,7 +71,7 @@ describe('monocle ' + (monocle.native ? '(es6)' : '(es5)'), function() {
 
   it('should yield undefined as default return', function(done) {
     var f = o_O(function*() {
-      yield sleep(0.1);
+      yield sleep(100);
     });
     run(function*() {
       var res = yield f();
@@ -271,7 +269,7 @@ describe('monocle ' + (monocle.native ? '(es6)' : '(es5)'), function() {
     run(function*() {
       var i;
       for (i = 0; i < 100; i++) {
-        yield sleep(0.02);
+        yield sleep(20);
       };
       i.should.equal(100);
       done();
@@ -301,13 +299,13 @@ describe('monocle ' + (monocle.native ? '(es6)' : '(es5)'), function() {
 
   it('should allow parallel execution', function(done) {
     var f1 = o_O(function*() {
-      yield sleep(0.5);
+      yield sleep(500);
     });
     var f2 = o_O(function*() {
-      yield sleep(0.25);
+      yield sleep(250);
     });
     var f3 = o_O(function*() {
-      yield sleep(0.33);
+      yield sleep(333);
     });
     run(function*() {
       var start = Date.now();
@@ -322,16 +320,16 @@ describe('monocle ' + (monocle.native ? '(es6)' : '(es5)'), function() {
   it('should pass parameters to parallel oroutines', function(done) {
     var f1 = o_O(function*(val) {
       val.should.equal("1");
-      yield sleep(0.5);
+      yield sleep(500);
     });
     var f2 = o_O(function*(val1, val2) {
       val1.should.equal("foo");
       val2.should.equal("bar");
-      yield sleep(0.25);
+      yield sleep(250);
     });
     var f3 = o_O(function*() {
       arguments.length.should.equal(0);
-      yield sleep(0.33);
+      yield sleep(333);
     });
     var f4 = o_O(function*() {
       arguments.length.should.equal(0);
@@ -349,13 +347,13 @@ describe('monocle ' + (monocle.native ? '(es6)' : '(es5)'), function() {
   it('should return values from parallel oroutines', function(done) {
     var f1 = o_O(function*(val) {
       val.should.equal("1");
-      yield sleep(0.5);
+      yield sleep(500);
       return 'a';
     });
     var f2 = o_O(function*(val1, val2) {
       val1.should.equal("foo");
       val2.should.equal("bar");
-      yield sleep(0.25);
+      yield sleep(250);
       return 'b';
     });
     var f3 = o_O(function*() {
@@ -412,7 +410,7 @@ describe('monocle ' + (monocle.native ? '(es6)' : '(es5)'), function() {
     run(function*() {
       var start = Date.now();
       try {
-        yield parallel([f1, [sleep, 0.25]]);
+        yield parallel([f1, [sleep, 250]]);
       } catch (e) {
         err = e;
       }
@@ -472,22 +470,22 @@ describe('monocle ' + (monocle.native ? '(es6)' : '(es5)'), function() {
         return this.data;
       };
       Clazz.prototype.f1 = o_P(function*(s) {
-        yield sleep(0.25);
+        yield sleep(250);
         this.data += "f1:" + s;
         return this;
       }, ['data']);
       Clazz.prototype.f2 = o_O(function*(s) {
-        yield sleep(0.25);
+        yield sleep(250);
         this.data += "f2::" + s + s;
         return this;
       });
       Clazz.prototype.f3 = o_O(function*(s) {
-        yield sleep(0.25);
+        yield sleep(250);
         this.data += "f3:::" + s + s + s;
         return this.data;
       });
       Clazz.prototype.f4 = o_O(function*(s) {
-        yield sleep(0.25);
+        yield sleep(250);
         return [new Clazz(s), new Clazz(s), this];
       });
 

@@ -194,7 +194,7 @@ you're yielding is an o-routine or callback. See the examples below:
 ```js
 var myFunc = o_O(function*() {
     // this is good, monocle.utils.sleep is an o-routine
-    yield monocle.utils.sleep(1);
+    yield monocle.utils.sleep(1000);
 
     // this is good, cb is a monocle callback
     var cb = o_C();
@@ -311,7 +311,7 @@ var monocle = require('monocle-js')
   , sleep = monocle.utils.sleep;
 
 var method1 = o_O(function*() {
-    yield sleep(0.5);
+    yield sleep(500);
     console.log("Hello");
 });
 
@@ -323,7 +323,7 @@ var method2 = o_O(function*(sleepTime, text) {
 run(function*() {
     yield ll([
         method1,
-        [method2, 0.25, "World!"]
+        [method2, 250, "World!"]
     ]);
 });
 ```
