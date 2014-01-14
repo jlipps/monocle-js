@@ -443,3 +443,5 @@ monocle.o_0
 monocle.oO
 monocle.o_P  // for chaining
 ```
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/jlipps/monocle-js/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
