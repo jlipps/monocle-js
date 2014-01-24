@@ -371,35 +371,24 @@ describe('monocle ' + (monocle.native ? '(es6)' : '(es5)'), function() {
     });
   });
 
-  it('should not swallow errors in run (oroutine)', function(done) {
+  it('should make errors from run available on cb.fin/nodeify', function(done) {
     var f1 = o_O(function*() {
+      yield sleep(50);
       throw new Error('oh noes!');
     });
-    var err;
-    try {
+    run(function*() {
+      yield f1();
+    }).fin(function(err) {
+      should.exist(err);
+      err.message.should.equal('oh noes!');
       run(function*() {
         yield f1();
+      }).nodeify(function(err2) {
+        should.exist(err2);
+        err2.message.should.equal('oh noes!');
+        done();
       });
-    } catch (e) {
-      err = e;
-    }
-    should.exist(err);
-    err.message.should.equal('oh noes!');
-    done();
-  });
-
-  it('should not swallow errors in run (local)', function(done) {
-    var err;
-    try {
-      run(function*() {
-        throw new Error("foobar!");
-      });
-    } catch (e) {
-      err = e;
-    }
-    should.exist(err);
-    err.message.should.equal('foobar!');
-    done();
+    });
   });
 
   it('should not swallow errors in parallel', function(done) {

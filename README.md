@@ -396,6 +396,39 @@ var result = yield obj1.foo().bar();
 All that matters is that the first function be defined as `chainable`. There's
 also a nice alias for `monocle.chainable`: `o_P`;
 
+Getting errors out of Monocle
+-----------------------------
+
+Despite the coolness of Monocle, Javascript is still, at the end of the day,
+callback-based. We haven't descended into fibers! What this means is that this
+will throw an unhandled error:
+
+```js
+try {
+    monocle.run(function*() {
+        yield myFunc();
+        yield sleep(50);
+        throw new Error("whoops");
+    });
+} catch (e) {
+    // we'll never get here, instead the error will crash the script
+}
+```
+
+Remember: `monocle.run` and `monocle.launch` are not synchronous! So if you
+want to do something with an error inside `run`, catch it with `.fin` or
+`.nodeify`:
+
+```js
+monocle.run(function*() {
+    yield myFunc();
+    yield sleep(50);
+    throw new Error("whoops");
+}).fin(function(err) {
+    console.log(err);  // whoops
+});
+```
+
 Enabling Javascript generators
 ----------------
 By default, generators and proxies (used for chaining) are not enabled in the
