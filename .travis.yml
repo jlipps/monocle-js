@@ -2,7 +2,7 @@ language: node_js
 before_script:
   - ./build.sh
 script:
-  - mocha --harmony -R spec -t 3000 test/
-  - mocha -R spec -t 3000 test/
+  - mocha --harmony -R spec -t 3000 test/es6/
+  - mocha -R spec -t 3000 test/es5/
 node_js:
   - 0.11
