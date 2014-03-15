@@ -429,6 +429,8 @@ monocle.run(function*() {
 });
 ```
 
+If you don't, we'll throw the error in the general context, which might cause strange undefined behavior, as mentioned above.
+
 Enabling Javascript generators
 ----------------
 By default, generators and proxies (used for chaining) are not enabled in the

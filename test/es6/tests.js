@@ -3,6 +3,7 @@
 
 var monocle = require('../../lib/main.js')
   , o_O = monocle.o_O
+  , domain = require("domain")
   , launch = monocle.launch
   , run = monocle.run
   , Q = require("q")
@@ -388,6 +389,26 @@ describe('monocle ' + (monocle.native ? '(es6)' : '(es5)'), function() {
         err2.message.should.equal('oh noes!');
         done();
       });
+    });
+  });
+
+  it('should not swallow errors in run without fin/nodeify', function(done) {
+    var d = domain.create();
+    var t;
+    d.on('error', function(err) {
+      clearTimeout(t);
+      should.exist(err);
+      err.message.should.equal("whoops!");
+      done();
+    });
+    d.run(function() {
+      run(function*() {
+        yield sleep(250);
+        throw new Error("whoops!");
+      });
+      t = setTimeout(function() {
+        done(new Error("Run swallowed error"));
+      }, 500);
     });
   });
 
