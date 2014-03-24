@@ -378,10 +378,11 @@ describe('monocle ' + (monocle.native ? '(es6)' : '(es5)'), function() {
       throw new Error('oh noes!');
     });
     run(function*() {
+      throw new Error('woohoo');
       yield f1();
     }).fin(function(err) {
       should.exist(err);
-      err.message.should.equal('oh noes!');
+      err.message.should.equal('woohoo');
       run(function*() {
         yield f1();
       }).nodeify(function(err2) {
