@@ -378,6 +378,7 @@ describe('monocle ' + (monocle.native ? '(es6)' : '(es5)'), function() {
       throw new Error('oh noes!');
     });
     run(function*() {
+      yield promiseSleep(20);
       throw new Error('woohoo');
       yield f1();
     }).fin(function(err) {
