@@ -472,6 +472,33 @@ describe('monocle ' + (monocle.native ? '(es6)' : '(es5)'), function() {
     });
   });
 
+  it('should monoclize things', function(done) {
+    var asyncFn = function(foo, bar, cb) {
+      setTimeout(function() {
+        if (foo === "bad") {
+          return cb(new Error("blarg"));
+        }
+        cb(null, foo + "lol" + bar);
+      }, 50);
+    };
+
+    var mAsyncFn = monocle.monoclize(asyncFn);
+
+    run(function*() {
+      var res = yield mAsyncFn("lo", "ol");
+      res.should.equal("lololol");
+      var err;
+      try {
+        yield mAsyncFn("bad", "oops");
+      } catch (e) {
+        err = e;
+      }
+      should.exist(err);
+      err.message.should.equal("blarg");
+      done();
+    });
+  });
+
   if (monocle.native) {
 
     describe('chaining callbacks', function() {
