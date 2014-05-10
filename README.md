@@ -246,7 +246,7 @@ var monocle = require('monocle-js')
   , o_M = monocle.o_M
   , fs = require('fs');
 
-var monoclizedRead = m(fs.readFile);
+var monoclizedRead = o_M(fs.readFile);
 ```
 
 For an example of how this is used to port entire Node libraries, check out
