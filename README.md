@@ -189,7 +189,9 @@ this:
 * `return` when you want to send back the result of an o-routine
 
 Because of these semantics, Monocle checks to make sure the only type of thing
-you're yielding is an o-routine or callback. See the examples below:
+you're yielding is an o-routine or callback. You can also yield iterators (what
+you get when you call generators) directly--they're converted into o-routines
+on the fly. See the examples below:
 
 ```js
 var myFunc = o_O(function*() {
@@ -200,6 +202,13 @@ var myFunc = o_O(function*() {
     var cb = o_C();
     setTimeout(cb, 1000);
     yield cb;
+
+    // this is good; pauseBriefly() returns an iterator
+    var pauseBriefly = function*() {
+        yield monocle.utils.sleep(500);
+    };
+    yield pauseBriefly();
+
 
     // this is bad, we should be returning instead; Math.pow is not an o-routine.
     // Monocle will throw an error

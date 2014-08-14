@@ -65,9 +65,20 @@ describe('monocle ' + (monocle.native ? '(es6)' : '(es5)'), function() {
         err = e;
       }
       should.exist(err);
-      err.message.should.include("o-routines can only yield callbacks");
+      err.message.should.containEql("o-routines can only yield callbacks");
       done();
     });
+  });
+
+  it('should be able to yield generators', function(done) {
+    var square = function*(x) {
+      yield sleep(5);
+      return x * x;
+    };
+    run(function*() {
+      var s = yield square(3);
+      s.should.equal(9);
+    }).nodeify(done);
   });
 
   it('should yield undefined as default return', function(done) {
@@ -428,7 +439,7 @@ describe('monocle ' + (monocle.native ? '(es6)' : '(es5)'), function() {
       }
       (Date.now() - start).should.be.above(240);
       should.exist(err);
-      err.message.should.include('One or more');
+      err.message.should.containEql('One or more');
       err.allErrors[0].message.should.eql('oh noes!');
       done();
     });
@@ -467,7 +478,7 @@ describe('monocle ' + (monocle.native ? '(es6)' : '(es5)'), function() {
       }
       should.exist(err);
       (Date.now() - start).should.be.below(149);
-      err.message.should.include('sleeping');
+      err.message.should.containEql('sleeping');
       done();
     });
   });
