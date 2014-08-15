@@ -448,6 +448,39 @@ V8 Javascript engine which powers Node. In Node 11, generators are available
 but not enabled unless you pass the `--harmony` flag. If you're using
 monocle-js, make sure to do that!
 
+Making libraries compatible with vanilla Node-style async methods
+----------------
+Let's say you want to use monocle-js to write your code, but you also want to
+export library methods for people who don't have monocle-js to use. Basically,
+what we need is a way to take an o-routine (or generator) and turn it into
+a regular Node-style callback-based method. This is super easy with
+`monocle.nodeify` (or `monocle.no` for short--get it? For when you want to say
+"no" to monocle!). Take this simple o-routine, for example:
+
+```js
+var sleepTwice = o_O(function*(x, y) {
+    yield sleep(x);
+    yield sleep(y);
+});
+```
+
+If we wanted to export this for others to use, we can simply add this to our
+exports:
+
+```js
+module.exports.sleepTwice = monocle.no(sleepTwice);
+```
+
+Now someone can call it as expected in their own callback-based code:
+
+```js
+var sleepTwice = require('yourlibrary').sleepTwice;
+
+sleepTwice(50, 100, function(err) {
+    // do stuff
+});
+```
+
 Running tests
 -------------
 Monocle's tests are written in Mocha. Simply run this command:

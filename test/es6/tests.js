@@ -510,6 +510,29 @@ describe('monocle ' + (monocle.native ? '(es6)' : '(es5)'), function() {
     });
   });
 
+  it('should nodeify o-routines', function(done) {
+    var nodeAsyncFn = monocle.no(sleep);
+    var start = Date.now();
+    nodeAsyncFn(50, function (err) {
+      should.not.exist(err);
+      (Date.now() - start).should.be.above(49);
+      done();
+    });
+  });
+
+  it('should nodeify generators', function(done) {
+    var myGen = function*(x, y) {
+      yield sleep(x + y);
+    };
+    var nodeAsyncFn = monocle.no(myGen);
+    var start = Date.now();
+    nodeAsyncFn(50, 25, function (err) {
+      should.not.exist(err);
+      (Date.now() - start).should.be.above(74);
+      done();
+    });
+  });
+
   if (monocle.native) {
 
     describe('chaining callbacks', function() {
