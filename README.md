@@ -51,7 +51,7 @@ myLibraryFunction('http://somesite.com/json/data', function(err, resp, body) {
 ```
 
 This is obviously a contrived example, but when building up a library of
-project-speciic functionality, you often find yourself doing this in Node.
+project-specific functionality, you often find yourself doing this in Node.
 
 Here's what the same code could look like using Monocle:
 
@@ -228,7 +228,7 @@ used to turn a node-style async function into an o-routine automatically:
 `monocle.monoclize()` or `monocle.o_M()` for short. By "node-style async
 function", I mean one which takes a series of parameters, the last of which is
 a callback. Monocle assumes this callback takes at least two parameters: the
-first of which an error object (or `null`) used to determine whether the
+first of which is an error object (or `null`) used to determine whether the
 original function completed successfully.
 
 Let's look at an example. `fs.readFile()` is a node-style async function. We
