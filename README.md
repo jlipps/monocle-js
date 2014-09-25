@@ -47,11 +47,11 @@ myLibraryFunction('http://somesite.com/json/data', function(err, resp, body) {
         console.log(resp);
         console.log(body);
     }
-};
+});
 ```
 
 This is obviously a contrived example, but when building up a library of
-project-speciic functionality, you often find yourself doing this in Node.
+project-specific functionality, you often find yourself doing this in Node.
 
 Here's what the same code could look like using Monocle:
 
@@ -122,7 +122,7 @@ that `request` and `fs` have already been 'monoclized'.
 var request = require('request')
   , fs = require('fs')
   , monocle = require('monocle-js')
-  , o_O = monocle.o_O;
+  , o_O = monocle.o_O
   , o_C = monocle.callback;
 
 var myLibraryFunction = o_O(function*(jsonUrl) {
@@ -228,7 +228,7 @@ used to turn a node-style async function into an o-routine automatically:
 `monocle.monoclize()` or `monocle.o_M()` for short. By "node-style async
 function", I mean one which takes a series of parameters, the last of which is
 a callback. Monocle assumes this callback takes at least two parameters: the
-first of which an error object (or `null`) used to determine whether the
+first of which is an error object (or `null`) used to determine whether the
 original function completed successfully.
 
 Let's look at an example. `fs.readFile()` is a node-style async function. We
@@ -273,7 +273,8 @@ here's a bit of functional testing code using
 
 ```js
 var wd = require('wd')
-  , browser = wd.promiseRemote();
+  , browser = wd.promiseRemote()
+  , should = require('chai').should();
 
 browser
     .init({ browserName: 'chrome' })
@@ -282,7 +283,7 @@ browser
     })
     .then(function () { return browser.title();})
     .then(function (title) {
-        title.should.equal('I am a page title - Sauce Labs');
+        title.should.equal('WD Tests');
     })
     .fin(function () { browser.quit(); })
     .done();
@@ -294,13 +295,14 @@ title is as expected. We could rewrite this using Monocle as follows:
 ```js
 var wd = require('wd')
   , run = require('monocle-js').run
-  , browser = wd.promiseRemote();
+  , browser = wd.promiseRemote()
+  , should = require('chai').should();
 
 run(function*() {
     yield browser.init({ browserName: 'chrome' });
     yield browser.get("http://admc.io/wd/test-pages/guinea-pig.html");
     var title = yield browser.title();
-    title.should.equal('I am a page title - Sauce Labs');
+    title.should.equal('WD Tests');
     yield browser.quit();
 });
 ```
@@ -318,7 +320,8 @@ in parallel, it's really easy:
 var monocle = require('monocle-js')
   , run = monocle.run
   , ll = monocle.parallel
-  , sleep = monocle.utils.sleep;
+  , sleep = monocle.utils.sleep
+  , o_O = monocle.o_O;
 
 var method1 = o_O(function*() {
     yield sleep(500);
