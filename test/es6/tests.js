@@ -1,7 +1,8 @@
 /*global it:true, describe:true */
 "use strict";
 
-var monocle = require('../../lib/main.js')
+var features = require('../../lib/detect-harmony.js')
+  , monocle = require('../../lib/main.js')
   , o_O = monocle.o_O
   , domain = require("domain")
   , launch = monocle.launch
@@ -533,7 +534,7 @@ describe('monocle ' + (monocle.native ? '(es6)' : '(es5)'), function() {
     });
   });
 
-  if (monocle.native) {
+  if (monocle.native && features.proxies) {
 
     describe('chaining callbacks', function() {
       var Clazz = function(initStr) {

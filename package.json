@@ -26,10 +26,11 @@
   },
   "dependencies": {
     "underscore": "~1.4.4",
-    "harmony-reflect": "~0.0.13"
+    "harmony-reflect": "~1.1.1"
   },
   "scripts": {
-    "test": "./build.sh && mocha --harmony -t 3000 -R spec test/ && mocha -t 3000 -R spec test/"
+    "test": "./build.sh && mocha --harmony -t 3000 -R spec test/ && mocha -t 3000 -R spec test/",
+    "testio": "./build.sh && mochaio --harmony-proxies -t 3000 -R spec test/ && mochaio -t 3000 -R spec test/"
   },
   "devDependencies": {
     "mocha": "~1.21.4",
