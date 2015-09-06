@@ -130,6 +130,29 @@ describe('monocle ' + (monocle.native ? '(es6)' : '(es5)'), function() {
     });
   });
 
+  it('should catch thrown values and exit oroutine', function(done) {
+    var shouldntChange = "foo";
+    var fail1 = o_O(function*() {
+      throw "foo bar baz";
+      shouldntChange = "bar";
+    });
+    var fail2 = o_O(function*() {
+      yield fail1();
+    });
+    run(function*() {
+      var err;
+      try {
+        yield fail2();
+      } catch(e) {
+        err = e;
+      }
+      should.exist(err);
+      err.should.equal("foo bar baz");
+      shouldntChange.should.equal("foo");
+      done();
+    });
+  });
+
   it('should catch exceptions in async functions', function(done) {
     var shouldntChange = "foo";
     var errInAsync = function(cb) {
@@ -152,6 +175,33 @@ describe('monocle ' + (monocle.native ? '(es6)' : '(es5)'), function() {
       }
       should.exist(err);
       err.message.should.equal("foo bar baz");
+      shouldntChange.should.equal("foo");
+      done();
+    });
+  });
+
+  it('should catch non-Error exceptions in async functions', function(done) {
+    var shouldntChange = "foo";
+    var errInAsync = function(cb) {
+      cb("foo bar baz");
+    };
+    var fail1 = o_O(function*() {
+      var cb = o_C();
+      errInAsync(cb);
+      yield cb;
+    });
+    var fail2 = o_O(function*() {
+      yield fail1();
+    });
+    run(function*() {
+      var err;
+      try {
+        yield fail2();
+      } catch(e) {
+        err = e;
+      }
+      should.exist(err);
+      err.should.equal("foo bar baz");
       shouldntChange.should.equal("foo");
       done();
     });
@@ -182,6 +232,33 @@ describe('monocle ' + (monocle.native ? '(es6)' : '(es5)'), function() {
       var matches = re.exec(err.stack);
       matches.length.should.not.be.above(1);
       err.message.should.equal("foo bar baz");
+      shouldntChange.should.equal("foo");
+      done();
+    });
+  });
+
+  it('should not attempt to munge error traces of non-Errors', function(done) {
+    var shouldntChange = "foo";
+    var errInAsync = function(cb) {
+      cb("foo bar baz");
+    };
+    var fail1 = o_O(function*() {
+      var cb = o_C();
+      errInAsync(cb);
+      yield cb;
+    });
+    var fail2 = o_O(function*() {
+      yield fail1();
+    });
+    run(function*() {
+      var err;
+      try {
+        yield fail2();
+      } catch(e) {
+        err = e;
+      }
+      should.exist(err);
+      err.should.equal("foo bar baz");
       shouldntChange.should.equal("foo");
       done();
     });
