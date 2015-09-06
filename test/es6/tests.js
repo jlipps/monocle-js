@@ -11,7 +11,8 @@ var features = require('../../lib/detect-harmony.js')
   , parallel = monocle.parallel
   , o_C = monocle.callback
   , sleep = monocle.utils.sleep
-  , should = require('should');
+  , should = require('should')
+  , vm = require('vm');
 
 if (monocle.native) {
   var o_P = monocle.o_P;
@@ -130,6 +131,30 @@ describe('monocle ' + (monocle.native ? '(es6)' : '(es5)'), function() {
     });
   });
 
+  it('should catch vm exceptions and exit oroutine', function(done) {
+    var shouldntChange = "foo";
+    var vmContext = vm.createContext({});
+    var fail1 = o_O(function*() {
+      vm.runInContext("throw new Error(\"foo bar baz\");", vmContext, {displayErrors: false});
+      shouldntChange = "bar";
+    });
+    var fail2 = o_O(function*() {
+      yield fail1();
+    });
+    run(function*() {
+      var err;
+      try {
+        yield fail2();
+      } catch(e) {
+        err = e;
+      }
+      should.exist(err);
+      err.message.should.equal("foo bar baz");
+      shouldntChange.should.equal("foo");
+      done();
+    });
+  });
+
   it('should catch thrown values and exit oroutine', function(done) {
     var shouldntChange = "foo";
     var fail1 = o_O(function*() {
@@ -211,6 +236,43 @@ describe('monocle ' + (monocle.native ? '(es6)' : '(es5)'), function() {
     var shouldntChange = "foo";
     var errInAsync = function(cb) {
       cb(new Error("foo bar baz"));
+    };
+    var fail1 = o_O(function*() {
+      var cb = o_C();
+      errInAsync(cb);
+      yield cb;
+    });
+    var fail2 = o_O(function*() {
+      yield fail1();
+    });
+    run(function*() {
+      var err;
+      try {
+        yield fail2();
+      } catch(e) {
+        err = e;
+      }
+      should.exist(err);
+      var re = new RegExp("monocle\.js", "g");
+      var matches = re.exec(err.stack);
+      matches.length.should.not.be.above(1);
+      err.message.should.equal("foo bar baz");
+      shouldntChange.should.equal("foo");
+      done();
+    });
+  });
+
+  it('should have clean vm error traces', function(done) {
+    var shouldntChange = "foo";
+    var vmContext = vm.createContext({});
+    var errInAsync = function(cb) {
+      try {
+        vm.runInContext("throw new Error(\"foo bar baz\");", vmContext, {displayErrors: false});
+        shouldntChange = "bar";
+        cb();
+      } catch (e) {
+        cb(e);
+      }
     };
     var fail1 = o_O(function*() {
       var cb = o_C();
